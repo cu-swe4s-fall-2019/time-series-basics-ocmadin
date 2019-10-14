@@ -8,19 +8,42 @@ import datetime
 
 class ImportData:
     def __init__(self, data_csv):
+        
+        if data_csv is None:
+            raise TypeError("ImportData: No input filepath provided")
+            
+        if not isinstance(data_csv,str):
+            raise TypeError('ImportData: Filename must be string')
+        
         self._time = []
         self._value = []
+
+        with open(data_csv, "r") as fhandle:
+            try:
+                reader = csv.DictReader(fhandle)
+            except FileNotFoundError:
+                print('ImportData: File does not exist')
+            for row in reader:
+                try:
+                    self._time.append(dateutil.parser.parse(row['time']))
+                except ValueError:
+                    print('Bad input format for time')
+                    print(row['time'])
+                self._value.append(int(row['value']))
+            fhandle.close()
 
         # open file, create a reader from csv.DictReader, and read input times and values
 
     def linear_search_value(self, key_time):
         # return list of value(s) associated with key_time
         # if none, return -1 and error message
+        pass
 
     def binary_search_value(self,key_time):
         # optional extra credit
         # return list of value(s) associated with key_time
         # if none, return -1 and error message
+        pass
 
 def roundTimeArray(obj, res):
     # Inputs: obj (ImportData Object) and res (rounding resoultion)
@@ -33,10 +56,12 @@ def roundTimeArray(obj, res):
     # return: iterable zip object of the two lists
     # note: you can create additional variables to help with this task
     # which are not returned
+    pass
 
 
 def printArray(data_list, annotation_list, base_name, key_file):
     # combine and print on the key_file
+    pass
 
 if __name__ == '__main__':
 
@@ -57,7 +82,7 @@ if __name__ == '__main__':
 
 
     #pull all the folders in the file
-    files_lst = # list the folders
+    #files_lst = # list the folders
 
 
     #import all the files into a list of ImportData objects (in a loop!)
@@ -69,5 +94,5 @@ if __name__ == '__main__':
     data_15 = [] # a list with time rounded to 15min
 
     #print to a csv file
-    printLargeArray(data_5,files_lst,args.output_file+'_5',args.sort_key)
-    printLargeArray(data_15, files_lst,args.output_file+'_15',args.sort_key)
+    #printLargeArray(data_5,files_lst,args.output_file+'_5',args.sort_key)
+    #printLargeArray(data_15, files_lst,args.output_file+'_15',args.sort_key)
