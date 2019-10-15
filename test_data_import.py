@@ -111,3 +111,23 @@ class TestRoundTimeArray(unittest.TestCase):
         data=datimp.ImportData('smallData/cgm_small.csv')
         output = datimp.roundTimeArray(data,5)
         self.assertEqual(type(output),zip)
+        
+class TestPrintArray(unittest.TestCase):
+    def test_bad_data_list(self):
+        self.assertRaises(TypeError,datimp.printArray,None,['a','b','c','d'],'txt.fn','txt.str')
+        self.assertRaises(TypeError,datimp.printArray,1,['a','b','c','d'],'txt.fn','txt.str')
+        self.assertRaises(TypeError,datimp.printArray,'txt',['a','b','c','d'],'txt.fn','txt.str')
+    def test_bad_annotation_list(self):
+        self.assertRaises(TypeError,datimp.printArray,['a','b','c','d'],1,'txt.fn','txt.str')
+        self.assertRaises(TypeError,datimp.printArray,['a','b','c','d'],'str','txt.fn','txt.str')
+        self.assertRaises(TypeError,datimp.printArray,['a','b','c','d'],None,'txt.fn','txt.str')
+        
+    def test_bad_base_name(self):
+        self.assertRaises(TypeError,datimp.printArray,['a','b','c','d'],['a','b','c','d'],None,'txt.str')
+        self.assertRaises(TypeError,datimp.printArray,['a','b','c','d'],['a','b','c','d'],[1,1,1],'txt.str')
+        self.assertRaises(TypeError,datimp.printArray,['a','b','c','d'],['a','b','c','d'],1,'txt.str')
+                
+    def test_bad_key_file(self):
+        self.assertRaises(TypeError,datimp.printArray,['a','b','c','d'],['a','b','c','d'],'txt.str',None)
+        self.assertRaises(TypeError,datimp.printArray,['a','b','c','d'],['a','b','c','d'],'txt.str',[1,1,1])
+        self.assertRaises(TypeError,datimp.printArray,['a','b','c','d'],['a','b','c','d'],'txt.str',0)

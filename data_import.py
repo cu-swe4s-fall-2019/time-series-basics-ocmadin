@@ -123,27 +123,58 @@ def roundTimeArray(obj, res, repeat_operation='average'):
     output = zip(obj._time,obj._value)
 
     return output
-    
-    
-                
-    
 
-    # Inputs: obj (ImportData Object) and res (rounding resoultion)
-    # objective:
-    # create a list of datetime entries and associated values
-    # with the times rounded to the nearest rounding resolution (res)
-    # ensure no duplicated times
-    # handle duplicated values for a single timestamp based on instructions in
-    # the assignment
-    # return: iterable zip object of the two lists
-    # note: you can create additional variables to help with this task
-    # which are not returned
-    pass
 
 
 def printArray(data_list, annotation_list, base_name, key_file):
-    # combine and print on the key_file
-    pass
+    
+    if data_list is None:
+        raise TypeError('printArray: requires data_list')
+    if annotation_list is None:
+        raise TypeError('printArray: requires annotation_list')
+    if base_name is None:
+        raise TypeError('printArray: requires base_name')
+    if key_file is None:
+        raise TypeError('printArray: requires key_file')
+    if not isinstance(data_list,list):
+        raise TypeError('printArray: data_list must be list')
+    if not isinstance(annotation_list,list):
+        raise TypeError('printArray: annotation_list must be list')
+    if not isinstance(base_name,str):
+        raise TypeError('printArray: base_name must be str')
+    if not isinstance(key_file,str):
+        raise TypeError('printArray: key_file must be str')
+        
+
+    
+    for i in range(len(annotation_list)):
+        if i == key_file:
+            align_data = data_list[i]
+            key_index = i
+            break
+
+    if '.csv' not in base_name:
+        raise TypeError('printArray: base_name must end with .csv')
+        
+
+    with open(base_name, 'w') as f:
+        f.write('time'+annotation_list[key_index].split('_')[0]+',')
+        other_files = list(range(len(annotation_list)))
+        other_files.remove(key_index)
+        
+        for i in other_files:
+            f.write(annotation_list[key_index].split('_')[0])
+        f.write('\n')
+        
+        for time, value in align_data:
+            f.write(str(time)+','+str(value)+',')
+            for i in other_files:
+                time_list = [data[0] for data in data_list[i]]
+                if time in time_list:
+                    f.write(str(data_list[i][time_list.index(time)][1])+',')
+                else: f.write('0,')
+            f.write('\n')
+            
 
 if __name__ == '__main__':
 
@@ -151,11 +182,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description= 'A class to import, combine, and print data from a folder.',
     prog= 'dataImport')
 
-    parser.add_argument('folder_name', type = str, help = 'Name of the folder')
+    parser.add_argument('--folder_name', type = str, help = 'Name of the folder')
 
-    parser.add_argument('output_file', type=str, help = 'Name of Output file')
+    parser.add_argument('--output_file', type=str, help = 'Name of Output file')
 
-    parser.add_argument('sort_key', type = str, help = 'File to sort on')
+    parser.add_argument('--sort_key', type = str, help = 'File to sort on')
 
     parser.add_argument('--number_of_files', type = int,
     help = "Number of Files", required = False)
@@ -164,17 +195,32 @@ if __name__ == '__main__':
 
 
     #pull all the folders in the file
-    #files_lst = # list the folders
-
+    files_lst = [file for file in listdir(args.folder_name+'/')] # list the folders
 
     #import all the files into a list of ImportData objects (in a loop!)
     data_lst = []
-
+    
+    for file in files_lst:
+        data_lst.append([file,ImportData(file)])
+        
     #create two new lists of zip objects
     # do this in a loop, where you loop through the data_lst
+
     data_5 = [] # a list with time rounded to 5min
     data_15 = [] # a list with time rounded to 15min
+    
+    for data in data_lst:
+        if data[0] == 'activity_small.csv':
+            repeat_operation='sum'
+        elif data[0] == 'bolus_small.csv':
+            repeat_operation='sum'
+        elif data[0] == 'meal_small.csv':
+            repeat_operation='sum'
+        else:
+            repeat_operation = 'average'
+        data_5.append(roundTimeArray(data[1],5,repeat_operation))
+        data_15.append(roundTimeArray(data[1],5,repeat_operation))
 
     #print to a csv file
-    #printLargeArray(data_5,files_lst,args.output_file+'_5',args.sort_key)
-    #printLargeArray(data_15, files_lst,args.output_file+'_15',args.sort_key)
+    printArray(data_5,files_lst,args.output_file+'_5',args.sort_key)
+    printArray(data_15, files_lst,args.output_file+'_15',args.sort_key)
