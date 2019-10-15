@@ -37,18 +37,24 @@ class ImportData:
                         print('ImportData: Removing blank value')
                         continue
                     if row['value'] == 'low':
-                        self._value.append(int(40))
+                        self._value.append(float(40))
                         print('ImportData: Replacing "low" value with 40')
                     elif row['value'] == 'high':
-                        self._value.append(int(300))
+                        self._value.append(float(300))
                         print('ImportData: Replacing "high" value with 300')
-                    else:    
-                        self._value.append(int(row['value']))
+                    else:
+                        try:
+                            self._value.append(float(row['value']))
+                        except ValueError:
+                            continue
                 else:
                     if row['value'] == '':
                         print('ImportData: Removing blank value')
                         continue
-                    self._value.append(int(row['value']))
+                    try:
+                        self._value.append(float(row['value']))
+                    except ValueError:
+                        continue
             fhandle.close()
 
         # open file, create a reader from csv.DictReader, and read input times and values
@@ -98,7 +104,7 @@ def roundTimeArray(obj, res, repeat_operation='average'):
             newtime = time - minminus
         else:
             newtime=time + minplus
-    rounded_times.append(newtime)
+            rounded_times.append(newtime)
     
     obj._time = rounded_times
     
@@ -148,7 +154,7 @@ def printArray(data_list, annotation_list, base_name, key_file):
 
     
     for i in range(len(annotation_list)):
-        if i == key_file:
+       if key_file in annotation_list[i]:
             align_data = data_list[i]
             key_index = i
             break
@@ -195,13 +201,13 @@ if __name__ == '__main__':
 
 
     #pull all the folders in the file
-    files_lst = [file for file in listdir(args.folder_name+'/')] # list the folders
+    files_lst = [file for file in listdir(args.folder_name)] # list the folders
 
     #import all the files into a list of ImportData objects (in a loop!)
     data_lst = []
     
     for file in files_lst:
-        data_lst.append([file,ImportData(file)])
+        data_lst.append([file,ImportData(args.folder_name+'/'+file)])
         
     #create two new lists of zip objects
     # do this in a loop, where you loop through the data_lst
@@ -219,8 +225,8 @@ if __name__ == '__main__':
         else:
             repeat_operation = 'average'
         data_5.append(roundTimeArray(data[1],5,repeat_operation))
-        data_15.append(roundTimeArray(data[1],5,repeat_operation))
+        data_15.append(roundTimeArray(data[1],15,repeat_operation))
 
     #print to a csv file
-    printArray(data_5,files_lst,args.output_file+'_5',args.sort_key)
-    printArray(data_15, files_lst,args.output_file+'_15',args.sort_key)
+    printArray(data_5,files_lst,'5'+args.output_file,args.sort_key)
+    printArray(data_15, files_lst,'15'+args.output_file,args.sort_key)
