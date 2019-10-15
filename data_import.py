@@ -53,6 +53,19 @@ class ImportData:
         # open file, create a reader from csv.DictReader, and read input times and values
 
     def linear_search_value(self, key_time):
+        if key_time is None:
+            raise TypeError('ImportData.linear_search_value: No key value supplied')
+            
+        if not isinstance(key_time,datetime.datetime):
+            raise TypeError('ImportData.linear_search_value: Key must be datetime.datetime data type')
+            
+        for i in range(len(self._time)):
+            curr =  self._time[i]
+            if key_time == curr:
+                return self._value[i]
+        print('invalid time')
+        return -1
+            
         # return list of value(s) associated with key_time
         # if none, return -1 and error message
         pass
