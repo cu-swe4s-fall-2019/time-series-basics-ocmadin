@@ -27,13 +27,6 @@ def create_test_csvs():
         f.write(str(0)+','+str(datetime.now())+','+''+'\n')  
         f.write(str(1)+','+str(datetime.now())+','+'10'+'\n')  
 
-    
-    
-
-
-
-
-
 
 class TestImportData(unittest.TestCase):
     create_test_csvs()
@@ -98,3 +91,23 @@ class TestImportData(unittest.TestCase):
         os.remove('bad_value_test.csv')
         os.remove('bad_date_test.csv')
         os.remove('static_test.csv')
+
+class TestRoundTimeArray(unittest.TestCase):
+    def test_no_object(self):
+        self.assertRaises(TypeError,datimp.roundTimeArray,None,5)
+    def test_no_res(self):
+        data=datimp.ImportData('smallData/cgm_small.csv')
+        self.assertRaises(TypeError,datimp.roundTimeArray,data,None)
+    def test_obj_type(self):
+        self.assertRaises(TypeError,datimp.roundTimeArray,'text',5)
+        self.assertRaises(TypeError,datimp.roundTimeArray,[1,1,1],5)
+        self.assertRaises(TypeError,datimp.roundTimeArray,1,5)
+    def test_res_type(self):
+        data=datimp.ImportData('smallData/cgm_small.csv')
+        self.assertRaises(TypeError,datimp.roundTimeArray,data,'text')
+        self.assertRaises(TypeError,datimp.roundTimeArray,data,[1,1,1])
+        self.assertRaises(TypeError,datimp.roundTimeArray,data,{})
+    def test_round_output_type(self):
+        data=datimp.ImportData('smallData/cgm_small.csv')
+        output = datimp.roundTimeArray(data,5)
+        self.assertEqual(type(output),zip)

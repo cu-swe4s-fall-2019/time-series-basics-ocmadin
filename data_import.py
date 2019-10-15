@@ -4,6 +4,7 @@ from os import listdir
 from os.path import isfile, join
 import argparse
 import datetime
+import numpy as np
 
 
 class ImportData:
@@ -76,7 +77,57 @@ class ImportData:
         # if none, return -1 and error message
         pass
 
-def roundTimeArray(obj, res):
+def roundTimeArray(obj, res, repeat_operation='average'):
+    
+    if obj is None:
+        raise TypeError('roundTimeArray: requires an ImportData object')
+    if res is None:
+        raise TypeError('roundTimeArray: requires a rounding resolution')
+    if not isinstance(obj,ImportData):
+        raise TypeError('roundTimeArray: obj must be an ImportData object')
+    if not isinstance(res,(int,float)):
+        raise TypeError('roundTimeArray: res must be a float or int')
+    
+    #round times to resolution and return to object array
+    
+    rounded_times = []
+    for time in obj._time:
+        minminus = datetime.timedelta(minutes = (time.minute % res))
+        minplus = datetime.timedelta(minutes=res) - minminus
+        if (time.minute % res) <= res/2:
+            newtime = time - minminus
+        else:
+            newtime=time + minplus
+    rounded_times.append(newtime)
+    
+    obj._time = rounded_times
+    
+    #remove duplicate times from the array
+    
+    unique_times = []
+    unique_values = []
+    for time in obj._time:
+        if time not in unique_times:
+            if repeat_operation == 'average':
+                combined_value = np.average(obj.linear_search_value(time))
+            if repeat_operation == 'sum':
+                combined_value = np.sum(obj.linear_search_value(time))
+                unique_times.append(time)
+                unique_values.append(combined_value)
+        else: 
+            continue
+    
+    obj._time = unique_times
+    obj._value = unique_values
+
+    output = zip(obj._time,obj._value)
+
+    return output
+    
+    
+                
+    
+
     # Inputs: obj (ImportData Object) and res (rounding resoultion)
     # objective:
     # create a list of datetime entries and associated values
