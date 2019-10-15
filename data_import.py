@@ -7,7 +7,7 @@ import datetime
 
 
 class ImportData:
-    def __init__(self, data_csv):
+    def __init__(self, data_csv,replace_high_low=False):
         
         if data_csv is None:
             raise TypeError("ImportData: No input filepath provided")
@@ -25,11 +25,29 @@ class ImportData:
                 print('ImportData: File does not exist')
             for row in reader:
                 try:
+                    if row['time'] == '':
+                        print('ImportData: Removing blank time value')
+                        continue
                     self._time.append(dateutil.parser.parse(row['time']))
                 except ValueError:
-                    print('Bad input format for time')
-                    print(row['time'])
-                self._value.append(int(row['value']))
+                    raise ValueError('ImportData: Bad time value')
+                if replace_high_low is True:
+                    if row['value'] == '':
+                        print('ImportData: Removing blank value')
+                        continue
+                    if row['value'] == 'low':
+                        self._value.append(int(40))
+                        print('ImportData: Replacing "low" value with 40')
+                    elif row['value'] == 'high':
+                        self._value.append(int(300))
+                        print('ImportData: Replacing "high" value with 300')
+                    else:    
+                        self._value.append(int(row['value']))
+                else:
+                    if row['value'] == '':
+                        print('ImportData: Removing blank value')
+                        continue
+                    self._value.append(int(row['value']))
             fhandle.close()
 
         # open file, create a reader from csv.DictReader, and read input times and values
