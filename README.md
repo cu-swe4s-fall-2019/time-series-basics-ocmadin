@@ -14,13 +14,15 @@ This file takes all the csv files that are in the `smallData` folder, puts them 
 The benchmarks and results are as follows:
 
 ### Original
-``` /usr/bin/time -f '%e\t%M' python data_import.py --folder_name smallData/ --output_file 5out.csv --sort_key 
+``` 
+/usr/bin/time -f '%e\t%M' python data_import.py --folder_name smallData/ --output_file 5out.csv --sort_key 
 11.21	50468
 
 ```
 
 ### Pandas
-``` /usr/bin/time -f '%e\t%M' python pandas_import.py 
+``` 
+/usr/bin/time -f '%e\t%M' python pandas_import.py 
 2.47	103060
 ```
 
