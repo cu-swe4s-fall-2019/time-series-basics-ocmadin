@@ -15,23 +15,47 @@ def import_data(filepath):
         raise ImportError('import_data: filepath string must be csv')
 
 def format_data(filename):
-    filepath = 'smallData/'+filename
-    data_frame = import_data(filepath)
+
+    data_frame = import_data(filename)
     data_frame['time'] = pd.to_datetime(data_frame['time'])
     data_frame = data_frame.set_index('time')
+    data_frame = data_frame[data_frame['value'].apply(type) != str]
     data_frame['value'].astype(float)
+    new_title = get_title(filename)
+    data_frame = data_frame.rename(columns = {'value' : new_title})
     return data_frame
 
-        
+
+def get_title(filename):
+    sep1 = '/'
+    sep2 = '_'
+    text = filename.split(sep1,2)[1]
+    text = text.split(sep2,1)[0]
+    return text
+
 def main():
+    data_frames = []
     for filename in os.listdir('smallData'):
-        data_frame = import_data(filename)
-        data_frame = format_data(data_frame)
-    return data_frame
+
+        filepath = 'smallData/'+filename
+        data_frames.append(format_data(filepath))
+
+    df_key = data_frames[3]
+    del data_frames[3]
+    df = df_key.join(data_frames)
+    df=df.fillna(0)
+    df['time5'] = df.index.round('5min')
+    df['time15'] = df.index.round('15min')
+    
+    df_5 = df.set_index('5min')
+    df_15 = df.set_index('15min')
+    
+    
+    return df,df_5,df_15
         
     
 
 
 
 if __name__ == '__main__':
-    data_frame = main()
+    df,dfs = main()
