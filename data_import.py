@@ -154,25 +154,25 @@ def printArray(data_list, annotation_list, base_name, key_file):
 
     
     for i in range(len(annotation_list)):
-       if key_file in annotation_list[i]:
+        if key_file == 'smallData/'+annotation_list[i]:
             align_data = data_list[i]
             key_index = i
             break
 
     if '.csv' not in base_name:
         raise TypeError('printArray: base_name must end with .csv')
-        
 
     with open(base_name, 'w') as f:
-        f.write('time'+annotation_list[key_index].split('_')[0]+',')
+        f.write('time'+annotation_list[key_index].split('/')[-1].split('_')[0]+',')
         other_files = list(range(len(annotation_list)))
         other_files.remove(key_index)
         
         for i in other_files:
-            f.write(annotation_list[key_index].split('_')[0])
+            f.write(annotation_list[i].split('/')[-1].split('_')[0]+',')
         f.write('\n')
         
         for time, value in align_data:
+            print('NO')
             f.write(str(time)+','+str(value)+',')
             for i in other_files:
                 time_list = [data[0] for data in data_list[i]]
@@ -202,7 +202,6 @@ if __name__ == '__main__':
 
     #pull all the folders in the file
     files_lst = [file for file in listdir(args.folder_name)] # list the folders
-
     #import all the files into a list of ImportData objects (in a loop!)
     data_lst = []
     
