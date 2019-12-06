@@ -42,20 +42,28 @@ def main():
 
     df_key = data_frames[3]
     del data_frames[3]
-    df = df_key.join(data_frames)
+    df = df_key.join(data_frames,how='outer')
     df=df.fillna(0)
     df['time5'] = df.index.round('5min')
     df['time15'] = df.index.round('15min')
     
-    df_5 = df.set_index('5min')
-    df_15 = df.set_index('15min')
+    df= df[['cgm','activity','basal','bolus','hr','meal','smbg','time5','time15']]
+    df_5_sums = df[['activity','bolus','meal','time5']].groupby(['time5']).sum()
+    df_5_means = df[['cgm','basal','hr','smbg','time5']].groupby(['time5']).mean()
+    df_5 = df_5_means.join(df_5_sums,how='outer')
+
+    df_15_sums = df[['activity','bolus','meal','time15']].groupby(['time15']).sum()
+    df_15_means = df[['cgm','basal','hr','smbg','time15']].groupby(['time15']).mean()
+    df_15 = df_15_means.join(df_15_sums,how='outer')
     
+    df_5.to_csv('5min_data_pandas.csv')
+    df_15.to_csv('15min_data_pandas.csv')
+                                
     
-    return df,df_5,df_15
         
     
 
 
 
 if __name__ == '__main__':
-    df,dfs = main()
+    main()
